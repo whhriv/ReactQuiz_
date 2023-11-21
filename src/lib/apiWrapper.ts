@@ -13,14 +13,22 @@ import APIResponse from "../types/api";
 // }
 const base: string = 'https://cae-bookstore.herokuapp.com/question'
 const questionEndpoint: string = '/all'
-const userEndPoint: string = '/users'
+const userEndPoint: string = '/user'
+const loginEndPoint: string = '/login'
 
 const apiClientNoAuth = () => axios.create(
     {
         baseURL: base
     }
 )
-
+const apiClientBasicAuth = (email:string, password:string) => axios.create(
+    {
+        baseURL: base,
+        headers: {
+            Authorization: 'Basic' + btoa(`${email}:${password}`)
+        }
+    }
+)
 async function getAllQuestions(): Promise<APIResponse<QuestionType[]>> {
     let data;
     let error;
@@ -53,7 +61,26 @@ async function createNewUser(newUserData:Partial<UserType>): Promise<APIResponse
     return {data,error}
 }
 
+async function login(email:string, password:string): Promise<APIResponse<T>> {
+    let data;
+    let error;
+    try{
+        const response = await apiClientBasicAuth(email, password).get(loginEndPoint);
+        data = response.data
+    } catch(err) {
+        if (axios.isAxiosError(err)){
+            error = err.response?.data.error
+            console.log('error in axios')
+        } else {
+            error = 'Something went wrong with LOGIN in APIWrapper'
+        } 
+        
+    }
+    return {data, error}
+}
+
 export { 
     getAllQuestions,
-    createNewUser
+    createNewUser,
+    login
 }

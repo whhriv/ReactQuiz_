@@ -1,9 +1,12 @@
+import axios from 'axios'
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Card from 'react-bootstrap/Card'
 import Form from 'react-bootstrap/Form'
 import Button from 'react-bootstrap/Button'
 import UserType from '../types/auth'
+import { login } from '../lib/apiWrapper'
+
 
 type LoginProps = {
     
@@ -23,7 +26,7 @@ export default function Login({ isLoggedIn, logUserIn}: LoginProps) {
     })
 
 
-    const [userFormData, setUserFormData] = useState<Partial<UserType>>({username:'', password:''})
+    const [userFormData, setUserFormData] = useState<Partial<UserType>>({email:'', password:''})
 
 
 
@@ -31,40 +34,27 @@ export default function Login({ isLoggedIn, logUserIn}: LoginProps) {
         setUserFormData({...userFormData, [e.target.name]: e.target.value})
     }
 
-    const handleFormSubmit = (e: React.FormEvent): void => {
+    const handleFormSubmit = async (e: React.FormEvent): Promise<void> => {
         e.preventDefault()
-        logUserIn(userFormData)
-        navigate('/')
-        handleLogin(userFormData)
-    }
+        try {
+            // Using Axios for the login request
+            const response = await axios.get('https://cae-bookstore.herokuapp.com/login', {
+              headers: {
+                Authorization: `Basic ` + btoa(`${userFormData.email}:${userFormData.password}`),
+              },
+            });
+      
+            console.log(JSON.stringify(response.data));
+      
+           
+            logUserIn(userFormData);
+            navigate('/AllQuestions');
+          } catch (error) {
+            console.error(error);
+
+          }}
 
     
-    async function handleLogin(e:React.FormEvent<HTMLFormElement>){
-        // e.preventDefault()
-        const APIEndPoint = "https://cae-bookstore.herokuapp.com/login"
-    
-        var myHeaders = new Headers();
-        myHeaders.append("Authorization", "Basic Ym9iQGJvYi5jb206YmJiYmI=");
-        
-    
-    var formdata = new FormData();
-    console.log(formdata)    
-   
-   
-    fetch(APIEndPoint, {
-        method: 'GET',
-        headers: myHeaders,
-        body: formdata,
-        redirect: 'follow'
-      })
-
-    .then(response => response.text())
-    .then(result => console.log(result, "hey from login fetch"))
-    .catch(error => console.log('error', error));
-
-    navigate('/AllQuestions')
-
-    }
 
   return (
     <>
@@ -73,8 +63,8 @@ export default function Login({ isLoggedIn, logUserIn}: LoginProps) {
         <Card.Body>
             <Form onSubmit={handleFormSubmit}>
                
-                <Form.Label htmlFor='username'>username</Form.Label>
-                <Form.Control value={userFormData.email} name='username' onChange={handleInputChange}/>
+                <Form.Label htmlFor='email'>Email</Form.Label>
+                <Form.Control value={userFormData.email} name='email' onChange={handleInputChange}/>
 
                 <Form.Label htmlFor='password'>Password</Form.Label>
                 <Form.Control value={userFormData.password} name='password' type='password' onChange={handleInputChange}/>
@@ -87,4 +77,4 @@ export default function Login({ isLoggedIn, logUserIn}: LoginProps) {
 
 </>
   )
-}
+  }
