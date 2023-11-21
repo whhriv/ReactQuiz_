@@ -1,18 +1,19 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Card from 'react-bootstrap/Card'
 import Form from 'react-bootstrap/Form'
 import Button from 'react-bootstrap/Button'
 import UserType from '../types/auth'
 import { useNavigate } from 'react-router-dom'
+import { createNewUser } from '../lib/apiWrapper'
 
 
 
-type Props = {
+type SignUpProps = {
     logUserIn: (user:Partial<UserType>) => void
 
 }
 
-export default function SignUp({ logUserIn }: Props) {
+export default function SignUp({ logUserIn }: SignUpProps) {
 
     const navigate = useNavigate()
 
@@ -20,12 +21,12 @@ export default function SignUp({ logUserIn }: Props) {
     const [userFormData, setUserFormData] = useState<Partial<UserType>>(
         {
        
-        firstName: '',
-        lastName: '',
+        first_name: '',
+        last_name: '',
         email:'',
-        username: '',
+        // username: '',
         password: '',
-        confirmPassword: '',
+        // confirmPassword?: '',
         }
     )
 
@@ -34,18 +35,85 @@ export default function SignUp({ logUserIn }: Props) {
         setUserFormData( {...userFormData, [e.target.name] : e.target.value } )
     }
 
-    const handleFormSubmit = (e:React.FormEvent): void => {
-        e.preventDefault()
-        logUserIn(userFormData)
-        navigate('/')
-    }
+    // const handleFormSubmit = async (e:React.FormEvent): Promise<void> => {
+    //     e.preventDefault()
+    //     const response = await createNewUser(userFormData)
+    //     if (response.error){
+    //         console.warn(response.error)
+    //     } else {
+    //         logUserIn(response.data!)
+    //         navigate('/')
+    //     }
+
+    // }
+
+    // sample code
+    async function handleFormSubmit(e: React.FormEvent<HTMLFormElement>) {
+        const apiEndpoint = "https://cae-bookstore.herokuapp.com/user";
+        e.preventDefault();
+
+        const data = await fetch(apiEndpoint, {
+            method: "POST",
+            body: JSON.stringify(userFormData),
+            mode: "cors",
+            headers: {
+                "Content-Type": "application/json",
+            },
+        });
+
+        if (data) {
+            alert("Sign up Successful");
+            const response = data;
+            console.log(response, 'FROM DATA');
+            navigate("/AllQuestions");
+        } else {
+            alert("Failed to signup user");
+            console.log(data, 'from else');
+         }}
+    //sample code
+//     var myHeaders = new Headers();
+//     myHeaders.append("Content-Type", "application/json");
+    
+//     var raw = JSON.stringify({
+//         "email": userFormData.email,
+//         "first_name": userFormData.firstName,
+//         "last_name": userFormData.lastName,
+//         "password": userFormData.password
+//     });
+    
+//     var requestOptions = {
+//         method: 'POST',
+//         headers: myHeaders,
+//         body: raw,
+//         redirect: 'follow'
+//     };
+//   useEffect(() => {
+
+//        var requestOptions = {
+//         method: 'POST',
+//         headers: myHeaders,
+//         body: raw,
+//         redirect: 'follow'
+//     };
+
+//     fetch("https://cae-bookstore.herokuapp.com/user", requestOptions)
+//         .then(response => response.text())
+//         .then(result => console.log(result))
+//         .catch(error => console.log('error', error));
+    // const handleFormSubmit = (e:React.FormEvent): void => {
+    //     e.preventDefault()
+    //     logUserIn(userFormData)
+    //     navigate('/')
+    // }
+    // })
+
 
     const validatePasswords = (password:string, confirmPassword:string): boolean => {
         return password.length>=5 && password === confirmPassword
     }
     
     const validatedForm = validatePasswords(userFormData.password!, userFormData.confirmPassword!)
-    console.log(validatedForm)
+    console.log(validatedForm, 'from validate form')
 
     return (
         <>
@@ -54,16 +122,16 @@ export default function SignUp({ logUserIn }: Props) {
             <Card.Body>
                 <Form onSubmit={handleFormSubmit}>
                     <Form.Label htmlFor='firstName'>First Name</Form.Label>
-                    <Form.Control value={userFormData.firstName} name='firstName' onChange={handleInputChange}/>
+                    <Form.Control value={userFormData.first_name} name='first_name' onChange={handleInputChange}/>
 
                     <Form.Label htmlFor='lastname'>Last Name</Form.Label>
-                    <Form.Control value={userFormData.lastName} name='lastName' onChange={handleInputChange}/>
+                    <Form.Control value={userFormData.last_name} name='last_name' onChange={handleInputChange}/>
 
                     <Form.Label htmlFor='email'>Email</Form.Label>
                     <Form.Control value={userFormData.email} name='email' type='email'onChange={handleInputChange}/>
 
-                    <Form.Label htmlFor='username'>username</Form.Label>
-                    <Form.Control value={userFormData.username} name='username'onChange={handleInputChange}/>
+                    {/* <Form.Label htmlFor='username'>username</Form.Label>
+                    <Form.Control value={userFormData.username} name='username'onChange={handleInputChange}/> */}
 
                     <Form.Label htmlFor='password'>Password</Form.Label>
                     <Form.Control value={userFormData.password} name='password' type='password'onChange={handleInputChange}/>

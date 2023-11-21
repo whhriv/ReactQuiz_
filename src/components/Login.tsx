@@ -22,10 +22,7 @@ export default function Login({ isLoggedIn, logUserIn}: LoginProps) {
         }
     })
 
-    if (isLoggedIn){
-        navigate('/')
-    }
-    
+
     const [userFormData, setUserFormData] = useState<Partial<UserType>>({username:'', password:''})
 
 
@@ -38,7 +35,37 @@ export default function Login({ isLoggedIn, logUserIn}: LoginProps) {
         e.preventDefault()
         logUserIn(userFormData)
         navigate('/')
+        handleLogin(userFormData)
     }
+
+    
+    async function handleLogin(e:React.FormEvent<HTMLFormElement>){
+        // e.preventDefault()
+        const APIEndPoint = "https://cae-bookstore.herokuapp.com/login"
+    
+        var myHeaders = new Headers();
+        myHeaders.append("Authorization", "Basic Ym9iQGJvYi5jb206YmJiYmI=");
+        
+    
+    var formdata = new FormData();
+    console.log(formdata)    
+   
+   
+    fetch(APIEndPoint, {
+        method: 'GET',
+        headers: myHeaders,
+        body: formdata,
+        redirect: 'follow'
+      })
+
+    .then(response => response.text())
+    .then(result => console.log(result, "hey from login fetch"))
+    .catch(error => console.log('error', error));
+
+    navigate('/AllQuestions')
+
+    }
+
   return (
     <>
     <h1 className="text-center">Login</h1>
@@ -47,7 +74,7 @@ export default function Login({ isLoggedIn, logUserIn}: LoginProps) {
             <Form onSubmit={handleFormSubmit}>
                
                 <Form.Label htmlFor='username'>username</Form.Label>
-                <Form.Control value={userFormData.username} name='username' onChange={handleInputChange}/>
+                <Form.Control value={userFormData.email} name='username' onChange={handleInputChange}/>
 
                 <Form.Label htmlFor='password'>Password</Form.Label>
                 <Form.Control value={userFormData.password} name='password' type='password' onChange={handleInputChange}/>

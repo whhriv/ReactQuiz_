@@ -10,6 +10,8 @@ import '../index.css'
 import UserType from './types/auth'
 import AlertMessage from './components/AlertMessage'
 import CategoryType from './types/category'
+import CreateQuestion from './components/CreateQuestion'
+
 
 type Props = {}
 
@@ -53,6 +55,7 @@ const flashMessage = (newMessage:string|null, newCategory:CategoryType|null):voi
               <Route path="SignUp" element={<SignUp logUserIn={logUserIn} />} />
               <Route path="Login" element={<Login isLoggedIn={isLoggedIn} logUserIn={logUserIn} />} />
               <Route path="AllQuestions" element={<AllQuestions />} />
+              <Route path="CreateQuestion" element={<CreateQuestion />}/>
           </Routes>
           {/* <AllQuestions/> */}
         </Container>

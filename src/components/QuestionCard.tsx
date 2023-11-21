@@ -2,6 +2,7 @@ import Card from 'react-bootstrap/Card'
 import Button from 'react-bootstrap/Button'
 import { useState } from 'react'
 import Form from 'react-bootstrap/Form'
+import { getAllQuestions} from '../lib/apiWrapper'
 
 
 type QuestionType = {
